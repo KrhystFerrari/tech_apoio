@@ -1,0 +1,209 @@
+// Schema do TechApoio - Plataforma Educativa para Crianças
+// Aprenda mais sobre Prisma: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo de Usuário (Professor/Administrador)
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      UserRole @default(TEACHER)
+  school    String?  // Escola onde trabalha (opcional)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relacionamentos
+  students Student[]
+  classes  Class[]
+
+  @@map("users")
+}
+
+// Tipos de usuário
+enum UserRole {
+  TEACHER
+  ADMIN
+}
+
+// Modelo de Turma/Classe
+model Class {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  year        Int      // Ano escolar (1º, 2º, 3º, 4º, 5º ano)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relacionamentos
+  teacher   User      @relation(fields: [teacherId], references: [id])
+  teacherId String
+  students  Student[]
+
+  @@map("classes")
+}
+
+// Modelo de Estudante
+model Student {
+  id        String   @id @default(cuid())
+  name      String
+  age       Int
+  grade     Int      // Série/ano (1-5)
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relacionamentos
+  teacher   User      @relation(fields: [teacherId], references: [id])
+  teacherId String
+  class     Class?    @relation(fields: [classId], references: [id])
+  classId   String?
+  progress  Progress[]
+  scores    GameScore[]
+
+  @@map("students")
+}
+
+// Modelo de Área de Conhecimento
+model Subject {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String
+  color       String   // Cor hexadecimal para a área
+  icon        String   // Nome do ícone
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relacionamentos
+  activities Activity[]
+
+  @@map("subjects")
+}
+
+// Modelo de Atividade/Jogo
+model Activity {
+  id            String       @id @default(cuid())
+  title         String
+  description   String
+  type          ActivityType
+  difficulty    Difficulty   @default(EASY)
+  minAge        Int          @default(6)
+  maxAge        Int          @default(10)
+  instructions  String
+  content       Json         // Conteúdo específico da atividade (palavras, números, etc.)
+  isActive      Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  // Relacionamentos
+  subject    Subject     @relation(fields: [subjectId], references: [id])
+  subjectId  String
+  progress   Progress[]
+  gameScores GameScore[]
+
+  @@map("activities")
+}
+
+// Tipos de atividade
+enum ActivityType {
+  WORD_FORMATION    // Formar palavras
+  LETTER_RECOGNITION // Reconhecimento de letras
+  INTERACTIVE_STORY // História interativa
+  DIGITAL_DICTATION // Ditado digital
+  WORD_SEARCH       // Caça-palavras
+  COUNTING          // Contagem
+  MATH_OPERATIONS   // Operações matemáticas
+  NUMBER_PUZZLES    // Quebra-cabeças numéricos
+  SHAPE_RECOGNITION // Reconhecimento de formas
+  LOGICAL_SEQUENCE  // Sequência lógica
+  VISUAL_PROGRAMMING // Programação visual
+  ALGORITHM_BASICS  // Noções de algoritmo
+  SIMPLE_COMMANDS   // Comandos simples
+  BASIC_ANIMATIONS  // Animações básicas
+  DRAG_DROP         // Arrastar e soltar
+  INTERACTIVE_CYCLE // Ciclo interativo
+  VIRTUAL_EXPERIMENT // Experimento virtual
+}
+
+// Níveis de dificuldade
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+// Modelo de Progresso do Estudante
+model Progress {
+  id          String   @id @default(cuid())
+  completed   Boolean  @default(false)
+  attempts    Int      @default(0)
+  bestScore   Int      @default(0)
+  timeSpent   Int      @default(0) // Tempo em segundos
+  lastPlayed  DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relacionamentos
+  student    Student  @relation(fields: [studentId], references: [id])
+  studentId  String
+  activity   Activity @relation(fields: [activityId], references: [id])
+  activityId String
+
+  @@unique([studentId, activityId])
+  @@map("progress")
+}
+
+// Modelo de Pontuação de Jogo
+model GameScore {
+  id        String   @id @default(cuid())
+  score     Int
+  timeSpent Int      // Tempo em segundos
+  mistakes  Int      @default(0)
+  hints     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  // Relacionamentos
+  student    Student  @relation(fields: [studentId], references: [id])
+  studentId  String
+  activity   Activity @relation(fields: [activityId], references: [id])
+  activityId String
+
+  @@map("game_scores")
+}
+
+// Modelo de Palavras para jogos de Português
+model Word {
+  id          String     @id @default(cuid())
+  word        String     @unique
+  difficulty  Difficulty @default(EASY)
+  category    String     // Categoria da palavra (animais, cores, etc.)
+  syllables   Int        // Número de sílabas
+  audioUrl    String?    // URL do áudio da palavra
+  imageUrl    String?    // URL da imagem da palavra
+  meaning     String?    // Significado da palavra
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("words")
+}
+
+// Modelo de Números para jogos de Matemática  
+model Number {
+  id        String     @id @default(cuid())
+  number    Int        @unique
+  written   String     // Número por extenso
+  difficulty Difficulty @default(EASY)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@map("numbers")
+}
