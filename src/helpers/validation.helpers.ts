@@ -25,10 +25,11 @@ export interface FormField {
  */
 export function validateField(field: FormField): ValidationResult {
   const errors: string[] = [];
-  const { value, required, minLength, maxLength, pattern, customValidator } = field;
+  const { value, required, minLength, maxLength, pattern, customValidator } =
+    field;
 
   // Required validation
-  if (required && (!value || value.trim() === '')) {
+  if (required && (!value || value.trim() === "")) {
     errors.push(`${field.name} é obrigatório`);
     return { isValid: false, errors };
   }
@@ -60,7 +61,7 @@ export function validateField(field: FormField): ValidationResult {
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 }
 
@@ -79,7 +80,7 @@ export function validateForm(fields: FormField[]): ValidationResult {
 
   return {
     isValid: allErrors.length === 0,
-    errors: allErrors
+    errors: allErrors,
   };
 }
 
@@ -91,8 +92,8 @@ export function validateForm(fields: FormField[]): ValidationResult {
 export function sanitizeInput(input: string): string {
   return input
     .trim()
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/<[^>]*>/g, '');
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/<[^>]*>/g, "");
 }
 
 /**
@@ -101,10 +102,10 @@ export function sanitizeInput(input: string): string {
  * @returns Formatted error message
  */
 export function formatFormErrors(errors: string[]): string {
-  if (errors.length === 0) return '';
+  if (errors.length === 0) return "";
   if (errors.length === 1) return errors[0];
-  
-  return `• ${errors.join('\n• ')}`;
+
+  return `• ${errors.join("\n• ")}`;
 }
 
 /**
@@ -113,30 +114,30 @@ export function formatFormErrors(errors: string[]): string {
  * @returns True if CPF format is valid
  */
 export function validateCPF(cpf: string): boolean {
-  const cleanCPF = cpf.replace(/\D/g, '');
-  
+  const cleanCPF = cpf.replace(/\D/g, "");
+
   if (cleanCPF.length !== 11) return false;
   if (/^(\d)\1{10}$/.test(cleanCPF)) return false; // All same digits
-  
+
   // Validate check digits
   let sum = 0;
   for (let i = 0; i < 9; i++) {
     sum += Number.parseInt(cleanCPF[i]) * (10 - i);
   }
-  
+
   let checkDigit = 11 - (sum % 11);
   if (checkDigit >= 10) checkDigit = 0;
-  
+
   if (Number.parseInt(cleanCPF[9]) !== checkDigit) return false;
-  
+
   sum = 0;
   for (let i = 0; i < 10; i++) {
     sum += Number.parseInt(cleanCPF[i]) * (11 - i);
   }
-  
+
   checkDigit = 11 - (sum % 11);
   if (checkDigit >= 10) checkDigit = 0;
-  
+
   return Number.parseInt(cleanCPF[10]) === checkDigit;
 }
 
@@ -146,15 +147,21 @@ export function validateCPF(cpf: string): boolean {
  * @returns Formatted phone number
  */
 export function formatPhoneNumber(phone: string): string {
-  const cleanPhone = phone.replace(/\D/g, '');
-  
+  const cleanPhone = phone.replace(/\D/g, "");
+
   if (cleanPhone.length === 10) {
-    return `(${cleanPhone.slice(0, 2)}) ${cleanPhone.slice(2, 6)}-${cleanPhone.slice(6)}`;
+    return `(${cleanPhone.slice(0, 2)}) ${cleanPhone.slice(
+      2,
+      6
+    )}-${cleanPhone.slice(6)}`;
   }
-  
+
   if (cleanPhone.length === 11) {
-    return `(${cleanPhone.slice(0, 2)}) ${cleanPhone.slice(2, 7)}-${cleanPhone.slice(7)}`;
+    return `(${cleanPhone.slice(0, 2)}) ${cleanPhone.slice(
+      2,
+      7
+    )}-${cleanPhone.slice(7)}`;
   }
-  
+
   return phone;
 }

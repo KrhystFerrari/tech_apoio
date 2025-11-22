@@ -1,11 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { RefreshCw, Volume2 } from "lucide-react";
+import { RefreshCw, Volume2, BookOpen } from "lucide-react";
 import { toast } from "react-hot-toast";
-import Button from "../ui/Button";
-import Card from "../ui/Card";
 import { cn } from "@/lib/utils";
 import { 
   FormePalavrasGameProps, 
@@ -30,7 +28,7 @@ const palavrasPorNivel: Record<number, Palavra[]> = {
   1: [
     {
       palavra: "GATO",
-      dica: "Animal que faz miau",
+      dica: "Animal felino que faz miau",
       categoria: "animais",
       emoji: "🐱",
     },
@@ -42,13 +40,13 @@ const palavrasPorNivel: Record<number, Palavra[]> = {
     },
     {
       palavra: "BOLA",
-      dica: "Brinquedo redondo",
+      dica: "Brinquedo redondo para jogar",
       categoria: "brinquedos",
       emoji: "⚽",
     },
     {
       palavra: "PATO",
-      dica: "Animal que nada",
+      dica: "Animal aquático que faz quack",
       categoria: "animais",
       emoji: "🦆",
     },
@@ -56,73 +54,76 @@ const palavrasPorNivel: Record<number, Palavra[]> = {
   2: [
     {
       palavra: "FLOR",
-      dica: "É bonita e cheirosa",
+      dica: "Planta bonita e colorida",
       categoria: "natureza",
       emoji: "🌸",
     },
-    { palavra: "MESA", dica: "Onde comemos", categoria: "móveis", emoji: "🪑" },
+    { 
+      palavra: "MESA", 
+      dica: "Móvel onde comemos", 
+      categoria: "móveis", 
+      emoji: "🍽️" 
+    },
     {
       palavra: "LIVRO",
-      dica: "Tem muitas páginas",
+      dica: "Objeto com páginas para ler",
       categoria: "objetos",
       emoji: "📚",
     },
     {
-      palavra: "ÁRVORE",
-      dica: "É grande e verde",
-      categoria: "natureza",
-      emoji: "🌳",
+      palavra: "CARRO",
+      dica: "Veículo com quatro rodas",
+      categoria: "transportes",
+      emoji: "🚗",
     },
   ],
   3: [
     {
       palavra: "ESCOLA",
-      dica: "Lugar de aprender",
+      dica: "Lugar onde estudamos",
       categoria: "lugares",
       emoji: "🏫",
     },
     {
       palavra: "BONECA",
-      dica: "Brinquedo de menina",
+      dica: "Brinquedo em forma de pessoa",
       categoria: "brinquedos",
-      emoji: "👨‍🎓",
+      emoji: "🪆",
     },
     {
       palavra: "CAVALO",
-      dica: "Animal que galopa",
+      dica: "Animal que galopa e relincha",
       categoria: "animais",
       emoji: "🐴",
     },
     {
-      palavra: "FAMÍLIA",
-      dica: "Papai, mamãe e filhos",
-      categoria: "pessoas",
-      emoji: "👨‍👩‍👧‍👦",
+      palavra: "BORBOLETA",
+      dica: "Inseto colorido que voa",
+      categoria: "insetos",
+      emoji: "🦋",
     },
   ],
 };
 
-export default function FormePalavrasGame({
+export function FormePalavrasGame({
   onGameComplete,
   currentLevel,
 }: Readonly<FormePalavrasGameProps>) {
   const palavrasDoNivel = palavrasPorNivel[currentLevel] || palavrasPorNivel[1];
 
-  // Estados inicializados diretamente
-  const [palavraAtual, setPalavraAtual] = useState<Palavra>(() => {
-    const palavra = getRandomWord(palavrasDoNivel);
-    return palavra;
-  });
+  // Inicializar com a mesma palavra para evitar inconsistência
+  const [palavraInicial] = useState(() => getRandomWord(palavrasDoNivel));
+
+  // Estados inicializados com a mesma palavra
+  const [palavraAtual, setPalavraAtual] = useState<Palavra>(palavraInicial);
 
   const [letrasEmbaralhadas, setLetrasEmbaralhadas] = useState<string[]>(() => {
-    const palavra = getRandomWord(palavrasDoNivel);
-    return shuffleWordLetters(palavra.palavra);
+    return shuffleWordLetters(palavraInicial.palavra);
   });
 
   const [letrasColocadas, setLetrasColocadas] = useState<(string | null)[]>(
     () => {
-      const palavra = getRandomWord(palavrasDoNivel);
-      return createEmptySlots(palavra.palavra.length);
+      return createEmptySlots(palavraInicial.palavra.length);
     }
   );
 
@@ -133,6 +134,7 @@ export default function FormePalavrasGame({
   const [draggedLetter, setDraggedLetter] = useState<string | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [confettiData] = useState(() => generateConfettiData(20));
+  const isProcessingWordRef = useRef(false); // Previne múltiplas execuções
 
   // Inicializar nova palavra
   const novapalavra = useCallback(() => {
@@ -146,27 +148,34 @@ export default function FormePalavrasGame({
     // Reset das posições
     setLetrasColocadas(createEmptySlots(palavra.palavra.length));
     setTentativas((prev) => prev + 1);
+    isProcessingWordRef.current = false; // Reset do flag
   }, [palavrasDoNivel]);
 
   // Verificar palavra quando posições mudarem
   useEffect(() => {
-    if (letrasColocadas.every((letra) => letra !== null) && palavraAtual) {
+    if (letrasColocadas.every((letra) => letra !== null) && palavraAtual && !isProcessingWordRef.current) {
       const palavraFormada = letrasColocadas.join("");
       if (validateWord(palavraFormada, palavraAtual.palavra)) {
-        // Usar timeout para evitar setState em render
+        isProcessingWordRef.current = true; // Previne múltiplas execuções
+        
+        // Incrementar acertos usando timeout para evitar render durante effect
         setTimeout(() => {
-          setAcertos((prev) => prev + 1);
+          const novosAcertos = acertos + 1;
+          setAcertos(novosAcertos);
           setShowCelebration(true);
 
-          // Som de sucesso (simulado com toast)
-          toast.success(`🎉 Parabéns! Você formou ${palavraAtual.palavra}!`);
+          // Mostrar apenas UM toast de sucesso
+          toast.success(`🎉 Parabéns! Você formou ${palavraAtual.palavra}!`, {
+            id: `word-success-${palavraAtual.palavra}`, // ID único para evitar duplicatas
+            duration: 3000,
+          });
 
           setTimeout(() => {
             setShowCelebration(false);
-            if (isGameComplete(acertos + 1)) {
+            if (isGameComplete(novosAcertos)) {
               // Completou 3 palavras
               setGameComplete(true);
-              const score = calculateGameScore(acertos + 1, tentativas);
+              const score = calculateGameScore(novosAcertos, tentativas);
               onGameComplete(score);
             } else {
               novapalavra();
@@ -239,34 +248,221 @@ export default function FormePalavrasGame({
 
   if (gameComplete) {
     return (
-      <Card className="text-center p-8">
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          className="space-y-6"
-        >
-          <div className="text-6xl">🎉</div>
-          <h2 className="text-3xl font-bold text-primary-600">Parabéns!</h2>
-          <p className="text-xl text-gray-600">
-            Você completou o nível {currentLevel}!
-          </p>
-          <p className="text-lg">
-            Acertou {acertos} de {tentativas} palavras
-          </p>
-          <Button onClick={resetGame} variant="primary" size="lg">
-            Jogar Novamente
-          </Button>
-        </motion.div>
-      </Card>
+      <div style={{ background: "white", minHeight: "100vh", padding: "2rem 0" }}>
+        <div className="container-logiclike">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="card"
+            style={{
+              background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+              color: "white",
+              padding: "3rem",
+              borderRadius: "24px",
+              textAlign: "center",
+              border: "none",
+              maxWidth: "600px",
+              margin: "0 auto",
+            }}
+          >
+            {/* Emoji animado */}
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: [0, 1.2, 1] }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              style={{ fontSize: "4rem", marginBottom: "1.5rem" }}
+            >
+              🎉
+            </motion.div>
+
+            {/* Título principal */}
+            <motion.h2
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              style={{
+                fontSize: "2.5rem",
+                fontWeight: "700",
+                marginBottom: "1rem",
+                color: "white",
+              }}
+            >
+              Parabéns!
+            </motion.h2>
+
+            {/* Mensagem de conclusão */}
+            <motion.p
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              style={{
+                fontSize: "1.25rem",
+                opacity: 0.9,
+                marginBottom: "2rem",
+                color: "white",
+              }}
+            >
+              Você completou o nível {currentLevel}! 🚀
+            </motion.p>
+
+            {/* Estatísticas */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+              style={{
+                background: "rgba(255, 255, 255, 0.15)",
+                borderRadius: "16px",
+                padding: "1.5rem",
+                marginBottom: "2rem",
+                backdropFilter: "blur(10px)",
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+              }}
+            >
+              <div style={{ 
+                display: "flex", 
+                justifyContent: "space-around", 
+                alignItems: "center",
+                gap: "1rem"
+              }}>
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ 
+                    fontSize: "2rem", 
+                    fontWeight: "700", 
+                    color: "white",
+                    marginBottom: "0.5rem"
+                  }}>
+                    {acertos}
+                  </div>
+                  <div style={{ 
+                    fontSize: "0.9rem", 
+                    color: "rgba(255, 255, 255, 0.8)",
+                    fontWeight: "500"
+                  }}>
+                    Palavras
+                  </div>
+                </div>
+                <div style={{ 
+                  width: "2px", 
+                  height: "3rem", 
+                  background: "rgba(255, 255, 255, 0.3)",
+                  borderRadius: "1px"
+                }}></div>
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ 
+                    fontSize: "2rem", 
+                    fontWeight: "700", 
+                    color: "white",
+                    marginBottom: "0.5rem"
+                  }}>
+                    {Math.round((acertos / tentativas) * 100) || 100}%
+                  </div>
+                  <div style={{ 
+                    fontSize: "0.9rem", 
+                    color: "rgba(255, 255, 255, 0.8)",
+                    fontWeight: "500"
+                  }}>
+                    Precisão
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Botão seguindo o padrão do projeto */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 1 }}
+            >
+              <button 
+                onClick={resetGame} 
+                className="btn btn-large"
+                style={{
+                  backgroundColor: "white",
+                  color: "#3b82f6",
+                  fontWeight: "600",
+                  boxShadow: "0 4px 20px -2px rgba(0, 0, 0, 0.1)",
+                }}
+              >
+                🎮 Jogar Novamente
+              </button>
+            </motion.div>
+          </motion.div>
+        </div>
+      </div>
     );
   }
 
   if (!palavraAtual) {
     return (
-      <Card className="text-center p-8">
-        <div className="animate-spin w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full mx-auto"></div>
-        <p className="mt-4 text-gray-600">Carregando jogo...</p>
-      </Card>
+      <div 
+        style={{
+          minHeight: "60vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "white",
+        }}
+      >
+        <div className="container-logiclike">
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "24px",
+              textAlign: "center",
+            }}
+          >
+            {/* Ícone do livro com animação pulse */}
+            <div
+              style={{
+                width: "80px",
+                height: "80px",
+                backgroundColor: "#3b82f6",
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                animation: "pulse 2s ease-in-out infinite",
+              }}
+            >
+              <BookOpen 
+                size={40} 
+                color="white"
+              />
+            </div>
+            
+            <p 
+              style={{ 
+                fontSize: "18px", 
+                color: "#666666",
+                fontWeight: "500",
+                margin: 0,
+              }}
+            >
+              Carregando jogo...
+            </p>
+          </div>
+
+          {/* CSS para animação pulse */}
+          <style dangerouslySetInnerHTML={{
+            __html: `
+              @keyframes pulse {
+                0%, 100% {
+                  transform: scale(1);
+                  opacity: 1;
+                }
+                50% {
+                  transform: scale(1.1);
+                  opacity: 0.8;
+                }
+              }
+            `
+          }} />
+        </div>
+      </div>
     );
   }
 
@@ -349,22 +545,22 @@ export default function FormePalavrasGame({
           marginBottom: "2rem",
           flexWrap: "wrap"
         }}>
-          <Button
-            variant="accent"
-            size="sm"
-            icon={Volume2}
+          <button
+            className="btn btn-outline"
             onClick={() => toast(palavraAtual.dica, { icon: "💡" })}
+            style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
           >
+            <Volume2 style={{ width: "1rem", height: "1rem" }} />
             Dica
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            icon={RefreshCw}
+          </button>
+          <button
+            className="btn btn-secondary"
             onClick={novapalavra}
+            style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
           >
+            <RefreshCw style={{ width: "1rem", height: "1rem" }} />
             Nova Palavra
-          </Button>
+          </button>
         </div>
 
         {/* Área de Colocação das Letras - Responsiva */}

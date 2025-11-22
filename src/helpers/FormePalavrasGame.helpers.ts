@@ -3,8 +3,8 @@
  * Utilities for game logic, scoring, validation and word management
  */
 
-import { shuffleArray, getRandomElement } from './arrays.helpers';
-import type { Palavra } from '../interfaces/FormePalavrasGame.types';
+import { shuffleArray, getRandomElement } from "./arrays.helpers";
+import type { Palavra } from "../interfaces/FormePalavrasGame.types";
 
 /**
  * Shuffles the letters of a word
@@ -12,7 +12,7 @@ import type { Palavra } from '../interfaces/FormePalavrasGame.types';
  * @returns Array of shuffled letters
  */
 export function shuffleWordLetters(word: string): string[] {
-  return shuffleArray(word.split(''));
+  return shuffleArray(word.split(""));
 }
 
 /**
@@ -65,7 +65,7 @@ export function generateConfettiData(count: number = 20) {
     x: (Math.random() - 0.5) * 600,
     y: (Math.random() - 0.5) * 600,
     delay: Math.random() * 0.5,
-    emoji: getRandomElement(["🌟", "🎊", "🎈", "✨", "🎯"])
+    emoji: getRandomElement(["🌟", "🎊", "🎈", "✨", "🎯"]),
   }));
 }
 
@@ -97,8 +97,8 @@ export function getGameProgress(correct: number, target: number = 3): number {
  * @returns Updated slots array
  */
 export function placeLetter(
-  slots: (string | null)[], 
-  letter: string, 
+  slots: (string | null)[],
+  letter: string,
   position: number
 ): (string | null)[] {
   const newSlots = [...slots];
@@ -113,7 +113,7 @@ export function placeLetter(
  * @returns Object with updated slots and removed letter
  */
 export function removeLetter(
-  slots: (string | null)[], 
+  slots: (string | null)[],
   position: number
 ): { slots: (string | null)[]; removedLetter: string | null } {
   const newSlots = [...slots];

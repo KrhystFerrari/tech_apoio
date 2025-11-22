@@ -3,7 +3,7 @@
  * Utilities for landing page data, statistics and content management
  */
 
-import { LucideIcon } from 'lucide-react';
+import { LucideIcon } from "lucide-react";
 
 export interface BenefitItem {
   icon: LucideIcon;
@@ -39,16 +39,16 @@ export function getHeroStats(): StatItem[] {
   return [
     {
       number: "🏫 500+",
-      label: "Escolas parceiras"
+      label: "Escolas parceiras",
     },
     {
       number: "🎮 100+",
-      label: "Jogos educativos"
+      label: "Jogos educativos",
     },
     {
       number: "😊 98%",
-      label: "Crianças felizes"
-    }
+      label: "Crianças felizes",
+    },
   ];
 }
 
@@ -71,7 +71,7 @@ export function getTestimonialData(): TestimonialData {
     location: "Escola Municipal de São Paulo",
     avatar: "👩‍🏫",
     text: "O TechApoio revolucionou nossas aulas! As crianças ficam empolgadas com os jogos educativos e eu consigo acompanhar o progresso de cada aluno facilmente. A plataforma funciona perfeitamente nos tablets da escola!",
-    rating: 5
+    rating: 5,
   };
 }
 
@@ -84,7 +84,7 @@ export function getCTABenefits(): string[] {
     "🏫 Ideal para escolas e salas de aula",
     "⚡ Funciona em tempo real",
     "🎮 Jogos que as crianças adoram",
-    "📊 Relatórios para professores"
+    "📊 Relatórios para professores",
   ];
 }
 
@@ -93,11 +93,14 @@ export function getCTABenefits(): string[] {
  * @param benefit - Benefit string with emoji and text
  * @returns Object with separated emoji and text
  */
-export function extractEmojiAndText(benefit: string): { emoji: string; text: string } {
-  const [emoji, ...textParts] = benefit.split(' ');
+export function extractEmojiAndText(benefit: string): {
+  emoji: string;
+  text: string;
+} {
+  const [emoji, ...textParts] = benefit.split(" ");
   return {
     emoji,
-    text: textParts.join(' ')
+    text: textParts.join(" "),
   };
 }
 
@@ -107,7 +110,10 @@ export function extractEmojiAndText(benefit: string): { emoji: string; text: str
  * @param threshold - Scroll threshold (default: 50)
  * @returns True if scrolled past threshold
  */
-export function shouldShowScrollEffect(scrollY: number, threshold: number = 50): boolean {
+export function shouldShowScrollEffect(
+  scrollY: number,
+  threshold: number = 50
+): boolean {
   return scrollY > threshold;
 }
 
@@ -116,14 +122,16 @@ export function shouldShowScrollEffect(scrollY: number, threshold: number = 50):
  * @param type - Type of section ('hero' | 'benefits' | 'platform' | 'testimonial' | 'cta')
  * @returns Emoji string for the section
  */
-export function getSectionEmojis(type: 'hero' | 'benefits' | 'platform' | 'testimonial' | 'cta'): string {
+export function getSectionEmojis(
+  type: "hero" | "benefits" | "platform" | "testimonial" | "cta"
+): string {
   const emojiMap = {
     hero: "🚀📚✨",
     benefits: "🌈✨🎊",
     platform: "🎮🏫💡",
     testimonial: "💬⭐🏫",
-    cta: "🎉🚀📚✨"
+    cta: "🎉🚀📚✨",
   };
-  
+
   return emojiMap[type];
 }

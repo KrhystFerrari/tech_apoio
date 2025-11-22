@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/contexts/AuthContext";
-import { ArrowRight, User, Calendar, BookOpen } from "lucide-react";
+import { BookOpen } from "lucide-react";
+import { StudentLoginForm } from "@/components";
 
 export default function StudentLoginPage() {
   const [name, setName] = useState("");
@@ -84,218 +85,17 @@ export default function StudentLoginPage() {
             {/* Form Card */}
             <div className="card">
               <div className="card-content" style={{ padding: "40px" }}>
-                <form
+                <StudentLoginForm
+                  name={name}
+                  age={age}
+                  error={error}
+                  loading={loading}
+                  onNameChange={setName}
+                  onAgeChange={setAge}
                   onSubmit={handleSubmit}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "24px",
-                  }}
-                >
-                  <div>
-                    <label
-                      htmlFor="name"
-                      style={{
-                        display: "block",
-                        fontWeight: "500",
-                        color: "var(--text-primary)",
-                        marginBottom: "8px",
-                      }}
-                    >
-                      Seu Nome
-                    </label>
-                    <div style={{ position: "relative" }}>
-                      <User
-                        className="w-5 h-5"
-                        style={{
-                          position: "absolute",
-                          left: "12px",
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          color: "var(--text-muted)",
-                        }}
-                      />
-                      <input
-                        type="text"
-                        id="name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="Digite seu nome completo"
-                        style={{
-                          width: "100%",
-                          paddingLeft: "44px",
-                          paddingRight: "16px",
-                          paddingTop: "14px",
-                          paddingBottom: "14px",
-                          border: "1px solid var(--border-light)",
-                          borderRadius: "var(--radius-md)",
-                          fontFamily: "inherit",
-                          fontSize: "16px",
-                          transition: "all 0.2s ease",
-                          backgroundColor: "white",
-                        }}
-                        onFocus={(e) => {
-                          e.target.style.borderColor = "var(--primary-green)";
-                          e.target.style.boxShadow =
-                            "0 0 0 3px rgba(52, 168, 83, 0.1)";
-                        }}
-                        onBlur={(e) => {
-                          e.target.style.borderColor = "var(--border-light)";
-                          e.target.style.boxShadow = "none";
-                        }}
-                        required
-                        disabled={loading}
-                      />
-                    </div>
-                  </div>
+                />
 
-                  <div>
-                    <label
-                      htmlFor="age"
-                      style={{
-                        display: "block",
-                        fontWeight: "500",
-                        color: "var(--text-primary)",
-                        marginBottom: "8px",
-                      }}
-                    >
-                      Sua Idade
-                    </label>
-                    <div style={{ position: "relative" }}>
-                      <Calendar
-                        className="w-5 h-5"
-                        style={{
-                          position: "absolute",
-                          left: "12px",
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          color: "var(--text-muted)",
-                        }}
-                      />
-                      <input
-                        type="number"
-                        id="age"
-                        value={age}
-                        onChange={(e) => setAge(e.target.value)}
-                        placeholder="Ex: 8"
-                        min="5"
-                        max="18"
-                        style={{
-                          width: "100%",
-                          paddingLeft: "44px",
-                          paddingRight: "16px",
-                          paddingTop: "14px",
-                          paddingBottom: "14px",
-                          border: "1px solid var(--border-light)",
-                          borderRadius: "var(--radius-md)",
-                          fontFamily: "inherit",
-                          fontSize: "18px",
-                          textAlign: "center",
-                          transition: "all 0.2s ease",
-                          backgroundColor: "white",
-                        }}
-                        onFocus={(e) => {
-                          e.target.style.borderColor = "var(--primary-green)";
-                          e.target.style.boxShadow =
-                            "0 0 0 3px rgba(52, 168, 83, 0.1)";
-                        }}
-                        onBlur={(e) => {
-                          e.target.style.borderColor = "var(--border-light)";
-                          e.target.style.boxShadow = "none";
-                        }}
-                        required
-                        disabled={loading}
-                      />
-                    </div>
-                    <p
-                      style={{
-                        fontSize: "12px",
-                        color: "var(--text-muted)",
-                        marginTop: "8px",
-                        textAlign: "center",
-                      }}
-                    >
-                      Digite quantos anos você tem
-                    </p>
-                  </div>
-
-                  {error && (
-                    <div
-                      style={{
-                        background: "#fef2f2",
-                        border: "1px solid #fecaca",
-                        borderRadius: "var(--radius-md)",
-                        padding: "12px",
-                        textAlign: "center",
-                      }}
-                    >
-                      <p
-                        style={{
-                          color: "#dc2626",
-                          fontSize: "14px",
-                          margin: "0",
-                        }}
-                      >
-                        {error}
-                      </p>
-                    </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={loading || !name.trim() || !age.trim()}
-                    className="btn btn-primary btn-large"
-                    style={{
-                      width: "100%",
-                      background: "var(--primary-green)",
-                      border: "none",
-                    }}
-                    onMouseEnter={(e) => {
-                      const button = e.currentTarget as HTMLButtonElement;
-                      if (!button.disabled) {
-                        button.style.background = "#2d7d42";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      const button = e.currentTarget as HTMLButtonElement;
-                      if (!button.disabled) {
-                        button.style.background = "var(--primary-green)";
-                      }
-                    }}
-                  >
-                    {loading ? (
-                      <span
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <div
-                          className="spinner"
-                          style={{ marginRight: "8px" }}
-                        ></div>
-                        Entrando...
-                      </span>
-                    ) : (
-                      <span
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        Entrar na Aventura
-                        <ArrowRight
-                          className="w-5 h-5"
-                          style={{ marginLeft: "8px" }}
-                        />
-                      </span>
-                    )}
-                  </button>
-                </form>
-
-                {/* Footer */}
+                {/* Footer Links */}
                 <div
                   style={{
                     textAlign: "center",

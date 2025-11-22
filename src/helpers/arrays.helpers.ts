@@ -35,12 +35,14 @@ export function getRandomElement<T>(array: T[]): T {
  * @returns New array filled with the specified value
  */
 export function createFilledArray<T>(
-  length: number, 
+  length: number,
   fillValue: T | ((index: number) => T)
 ): T[] {
-  return Array.from({ length }, typeof fillValue === 'function' 
-    ? fillValue as (index: number) => T 
-    : () => fillValue
+  return Array.from(
+    { length },
+    typeof fillValue === "function"
+      ? (fillValue as (index: number) => T)
+      : () => fillValue
   );
 }
 
@@ -74,7 +76,7 @@ export function chunkArray<T>(array: T[], size: number): T[][] {
  * @returns Object with grouped elements
  */
 export function groupBy<T, K extends string | number>(
-  array: T[], 
+  array: T[],
   keyFn: (item: T) => K
 ): Record<K, T[]> {
   return array.reduce((groups, item) => {

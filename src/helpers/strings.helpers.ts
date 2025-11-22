@@ -18,7 +18,7 @@ export function capitalize(str: string): string {
  * @returns String in title case
  */
 export function titleCase(str: string): string {
-  return str.split(' ').map(capitalize).join(' ');
+  return str.split(" ").map(capitalize).join(" ");
 }
 
 /**
@@ -28,7 +28,11 @@ export function titleCase(str: string): string {
  * @param suffix - Suffix to add (default: '...')
  * @returns Truncated string
  */
-export function truncate(str: string, length: number, suffix: string = '...'): string {
+export function truncate(
+  str: string,
+  length: number,
+  suffix: string = "..."
+): string {
   if (str.length <= length) return str;
   return str.slice(0, length) + suffix;
 }
@@ -39,7 +43,7 @@ export function truncate(str: string, length: number, suffix: string = '...'): s
  * @returns String without spaces
  */
 export function removeSpaces(str: string): string {
-  return str.replace(/\s+/g, '');
+  return str.replace(/\s+/g, "");
 }
 
 /**
@@ -50,8 +54,8 @@ export function removeSpaces(str: string): string {
 export function toKebabCase(str: string): string {
   return str
     .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/\s+/g, '-');
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-");
 }
 
 /**
@@ -62,7 +66,7 @@ export function toKebabCase(str: string): string {
 export function toCamelCase(str: string): string {
   return str
     .toLowerCase()
-    .replace(/[^\w\s]/g, '')
+    .replace(/[^\w\s]/g, "")
     .replace(/\s+(.)/g, (_, char) => char.toUpperCase());
 }
 
@@ -83,11 +87,11 @@ export function isEmptyOrWhitespace(str: string): boolean {
  */
 export function getInitials(name: string, maxInitials: number = 2): string {
   return name
-    .split(' ')
-    .filter(word => word.length > 0)
+    .split(" ")
+    .filter((word) => word.length > 0)
     .slice(0, maxInitials)
-    .map(word => word.charAt(0).toUpperCase())
-    .join('');
+    .map((word) => word.charAt(0).toUpperCase())
+    .join("");
 }
 
 /**
@@ -97,10 +101,10 @@ export function getInitials(name: string, maxInitials: number = 2): string {
  * @returns Random string
  */
 export function generateRandomString(
-  length: number, 
-  chars: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  length: number,
+  chars: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 ): string {
-  let result = '';
+  let result = "";
   for (let i = 0; i < length; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
   }

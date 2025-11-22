@@ -5,7 +5,7 @@ import { Toaster } from "react-hot-toast";
 import { HydrationSafeWrapper } from "../lib/components/NoSSR";
 import { HydrationFix } from "../lib/components/HydrationFix";
 import { AuthProvider } from "../lib/contexts/AuthContext";
-import ConditionalBackToTop from "./components/ConditionalBackToTop";
+import ConditionalBackToTop from "../components/ConditionalBackToTop";
 
 const nunito = Nunito({
   subsets: ["latin"],

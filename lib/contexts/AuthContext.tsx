@@ -8,11 +8,11 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-import { 
-  User, 
-  Student, 
-  AuthContextType, 
-  AuthProviderProps 
+import {
+  User,
+  Student,
+  AuthContextType,
+  AuthProviderProps,
 } from "@/src/interfaces/AuthContext.types";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

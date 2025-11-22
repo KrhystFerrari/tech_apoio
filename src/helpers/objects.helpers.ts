@@ -19,7 +19,7 @@ export function deepClone<T>(obj: T): T {
  * @returns New object with only picked keys
  */
 export function pick<T extends Record<string, unknown>, K extends keyof T>(
-  obj: T, 
+  obj: T,
   keys: K[]
 ): Pick<T, K> {
   const result = {} as Pick<T, K>;
@@ -38,7 +38,7 @@ export function pick<T extends Record<string, unknown>, K extends keyof T>(
  * @returns New object without omitted keys
  */
 export function omit<T extends Record<string, unknown>, K extends keyof T>(
-  obj: T, 
+  obj: T,
   keys: K[]
 ): Omit<T, K> {
   const result = { ...obj };
@@ -62,7 +62,9 @@ export function isEmpty(obj: Record<string, unknown>): boolean {
  * @param obj - Object to get keys from
  * @returns Array of object keys
  */
-export function getKeys<T extends Record<string, unknown>>(obj: T): (keyof T)[] {
+export function getKeys<T extends Record<string, unknown>>(
+  obj: T
+): (keyof T)[] {
   return Object.keys(obj) as (keyof T)[];
 }
 
@@ -73,7 +75,7 @@ export function getKeys<T extends Record<string, unknown>>(obj: T): (keyof T)[] 
  * @returns Merged object
  */
 export function shallowMerge<T extends Record<string, unknown>>(
-  target: T, 
+  target: T,
   source: Partial<T>
 ): T {
   return { ...target, ...source };
@@ -90,10 +92,10 @@ export function mapValues<T extends Record<string, unknown>, R>(
   mapper: (value: T[keyof T], key: keyof T) => R
 ): Record<keyof T, R> {
   const result = {} as Record<keyof T, R>;
-  
+
   for (const key of getKeys(obj)) {
     result[key] = mapper(obj[key], key);
   }
-  
+
   return result;
 }

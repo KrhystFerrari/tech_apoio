@@ -113,14 +113,16 @@ export default function Footer() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
         >
-          <ClientOnly fallback={
-            <p className="text-kid-base font-kid text-gray-600">
-              © 2025 TechApoio - Plataforma Educativa.
-              <span className="block sm:inline sm:ml-2">
-                Iniciação tecnológica para crianças de 6 a 10 anos.
-              </span>
-            </p>
-          }>
+          <ClientOnly
+            fallback={
+              <p className="text-kid-base font-kid text-gray-600">
+                © 2025 TechApoio - Plataforma Educativa.
+                <span className="block sm:inline sm:ml-2">
+                  Iniciação tecnológica para crianças de 6 a 10 anos.
+                </span>
+              </p>
+            }
+          >
             <p className="text-kid-base font-kid text-gray-600">
               © {currentYear} TechApoio - Plataforma Educativa.
               <span className="block sm:inline sm:ml-2">

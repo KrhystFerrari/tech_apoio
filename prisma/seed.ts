@@ -1,4 +1,9 @@
-import { PrismaClient } from "../lib/generated/prisma";
+import {
+  PrismaClient,
+  BadgeCategory,
+  BadgeRarity,
+  RankingPeriod,
+} from "../lib/generated/prisma";
 import { numberToWords } from "../src/helpers/numbers.helpers";
 
 type DifficultyLevel = "EASY" | "MEDIUM" | "HARD";
@@ -343,7 +348,172 @@ async function main() {
 
   console.log("✅ Atividades criadas!");
 
-  // Criar usuário professor de exemplo
+  // Criar badges do sistema
+  const badges = [
+    // Badges de Português
+    {
+      name: "Primeiro Jogo - Português",
+      description: "Completou seu primeiro jogo de português!",
+      icon: "📖",
+      category: BadgeCategory.PROGRESS,
+      requirement: "Complete 1 jogo de português",
+      points: 10,
+      rarity: BadgeRarity.COMMON,
+    },
+    {
+      name: "Cinco Jogos - Português",
+      description: "Completou 5 jogos de português!",
+      icon: "🎯",
+      category: BadgeCategory.ACHIEVEMENT,
+      requirement: "Complete 5 jogos de português",
+      points: 25,
+      rarity: BadgeRarity.RARE,
+    },
+    {
+      name: "Mestre das Palavras",
+      description: "Expert em formação de palavras!",
+      icon: "👑",
+      category: BadgeCategory.MASTERY,
+      requirement: "Complete 10 jogos de português com pontuação perfeita",
+      points: 50,
+      rarity: BadgeRarity.EPIC,
+    },
+
+    // Badges de Matemática
+    {
+      name: "Contador",
+      description: "Dominou o jogo de contagem!",
+      icon: "🔢",
+      category: BadgeCategory.ACHIEVEMENT,
+      requirement: "Complete o jogo de contagem",
+      points: 15,
+      rarity: BadgeRarity.COMMON,
+    },
+    {
+      name: "Calculadora",
+      description: "Expert em operações matemáticas!",
+      icon: "🧮",
+      category: BadgeCategory.ACHIEVEMENT,
+      requirement: "Complete o jogo de operações",
+      points: 20,
+      rarity: BadgeRarity.RARE,
+    },
+    {
+      name: "Matemático",
+      description: "Completou 10 jogos de matemática!",
+      icon: "🎓",
+      category: BadgeCategory.MASTERY,
+      requirement: "Complete 10 jogos de matemática",
+      points: 40,
+      rarity: BadgeRarity.EPIC,
+    },
+
+    // Badges de Ciências
+    {
+      name: "Explorador",
+      description: "Começou a explorar o mundo das ciências!",
+      icon: "🔬",
+      category: BadgeCategory.PROGRESS,
+      requirement: "Complete 1 jogo de ciências",
+      points: 10,
+      rarity: BadgeRarity.COMMON,
+    },
+    {
+      name: "Cientista",
+      description: "Dominou 5 jogos de ciências!",
+      icon: "🧪",
+      category: BadgeCategory.ACHIEVEMENT,
+      requirement: "Complete 5 jogos de ciências",
+      points: 30,
+      rarity: BadgeRarity.RARE,
+    },
+
+    // Badges de Progresso
+    {
+      name: "Jogador Dedicado",
+      description: "Completou 20 jogos no total!",
+      icon: "🏆",
+      category: BadgeCategory.PROGRESS,
+      requirement: "Complete 20 jogos",
+      points: 50,
+      rarity: BadgeRarity.EPIC,
+    },
+    {
+      name: "Semana Completa",
+      description: "Jogou todos os dias da semana!",
+      icon: "📅",
+      category: BadgeCategory.STREAK,
+      requirement: "Jogue 7 dias consecutivos",
+      points: 35,
+      rarity: BadgeRarity.RARE,
+    },
+  ];
+
+  await Promise.all(
+    badges.map((badge) =>
+      prisma.badge.upsert({
+        where: { name: badge.name },
+        update: {},
+        create: badge,
+      })
+    )
+  );
+
+  console.log("✅ Badges criados!");
+
+  // Criar rankings iniciais
+  const currentDate = new Date();
+  const weekStart = new Date(currentDate);
+  weekStart.setDate(currentDate.getDate() - currentDate.getDay());
+
+  const monthStart = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth(),
+    1
+  );
+
+  const rankings = [
+    {
+      period: "WEEKLY" as RankingPeriod,
+      startDate: weekStart,
+      endDate: new Date(weekStart.getTime() + 7 * 24 * 60 * 60 * 1000),
+      subjectId: null, // Ranking geral
+    },
+    {
+      period: RankingPeriod.MONTHLY,
+      startDate: monthStart,
+      endDate: new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() + 1,
+        0
+      ),
+      subjectId: null, // Ranking geral
+    },
+    {
+      period: RankingPeriod.WEEKLY,
+      startDate: weekStart,
+      endDate: new Date(weekStart.getTime() + 7 * 24 * 60 * 60 * 1000),
+      subjectId: portuguesSubject.id, // Ranking de português
+    },
+    {
+      period: RankingPeriod.WEEKLY,
+      startDate: weekStart,
+      endDate: new Date(weekStart.getTime() + 7 * 24 * 60 * 60 * 1000),
+      subjectId: matematicaSubject.id, // Ranking de matemática
+    },
+  ];
+
+  await Promise.all(
+    rankings.map((ranking) =>
+      prisma.ranking.create({
+        data: ranking,
+      })
+    )
+  );
+
+  console.log("✅ Rankings criados!");
+
+  console.log("✅ Usuários e estudantes criados!");
   const teacher = await prisma.user.upsert({
     where: { email: "professor@techapoio.com" },
     update: {},
@@ -392,9 +562,11 @@ async function main() {
   console.log("🎉 Seed concluído com sucesso!");
 }
 
+// Execução principal
 try {
   await main();
   await prisma.$disconnect();
+  console.log("🎉 Seed concluído com sucesso!");
 } catch (e) {
   console.error("❌ Erro no seed:", e);
   await prisma.$disconnect();

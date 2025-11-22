@@ -26,14 +26,8 @@ export interface AuthContextType {
   user: User | null;
   student: Student | null;
   loading: boolean;
-  login: (
-    email: string,
-    password: string
-  ) => Promise<AuthLoginResponse>;
-  studentLogin: (
-    name: string,
-    age: string
-  ) => Promise<AuthLoginResponse>;
+  login: (email: string, password: string) => Promise<AuthLoginResponse>;
+  studentLogin: (name: string, age: string) => Promise<AuthLoginResponse>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   isStudent: boolean;

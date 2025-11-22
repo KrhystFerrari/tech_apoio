@@ -4,13 +4,13 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/contexts/AuthContext";
-import { Eye, EyeOff, Mail, Lock, ArrowRight, BookOpen } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import toast from "react-hot-toast";
+import { LoginForm, LoginLinks } from "@/components";
 
 export default function ProfessorLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const { login, user } = useAuth();
@@ -112,274 +112,21 @@ export default function ProfessorLoginPage() {
             {/* Form Card */}
             <div className="card">
               <div className="card-content" style={{ padding: "40px" }}>
-                <form
+                <LoginForm
+                  email={email}
+                  password={password}
+                  isLoading={isLoading}
+                  onEmailChange={setEmail}
+                  onPasswordChange={setPassword}
                   onSubmit={handleSubmit}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "24px",
-                  }}
-                >
-                  <div>
-                    <label
-                      htmlFor="email"
-                      style={{
-                        display: "block",
-                        fontWeight: "500",
-                        color: "var(--text-primary)",
-                        marginBottom: "8px",
-                      }}
-                    >
-                      Email
-                    </label>
-                    <div style={{ position: "relative" }}>
-                      <Mail
-                        className="w-5 h-5"
-                        style={{
-                          position: "absolute",
-                          left: "12px",
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          color: "var(--text-muted)",
-                        }}
-                      />
-                      <input
-                        type="email"
-                        id="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="professor@escola.com"
-                        style={{
-                          width: "100%",
-                          paddingLeft: "44px",
-                          paddingRight: "16px",
-                          paddingTop: "14px",
-                          paddingBottom: "14px",
-                          border: "1px solid var(--border-light)",
-                          borderRadius: "var(--radius-md)",
-                          fontFamily: "inherit",
-                          fontSize: "16px",
-                          transition: "all 0.2s ease",
-                          backgroundColor: "white",
-                        }}
-                        onFocus={(e) => {
-                          e.target.style.borderColor = "var(--primary-blue)";
-                          e.target.style.boxShadow =
-                            "0 0 0 3px rgba(66, 133, 244, 0.1)";
-                        }}
-                        onBlur={(e) => {
-                          e.target.style.borderColor = "var(--border-light)";
-                          e.target.style.boxShadow = "none";
-                        }}
-                        required
-                        disabled={isLoading}
-                      />
-                    </div>
-                  </div>
+                />
 
-                  <div>
-                    <label
-                      htmlFor="password"
-                      style={{
-                        display: "block",
-                        fontWeight: "500",
-                        color: "var(--text-primary)",
-                        marginBottom: "8px",
-                      }}
-                    >
-                      Senha
-                    </label>
-                    <div style={{ position: "relative" }}>
-                      <Lock
-                        className="w-5 h-5"
-                        style={{
-                          position: "absolute",
-                          left: "12px",
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          color: "var(--text-muted)",
-                        }}
-                      />
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        id="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="••••••••"
-                        style={{
-                          width: "100%",
-                          paddingLeft: "44px",
-                          paddingRight: "44px",
-                          paddingTop: "14px",
-                          paddingBottom: "14px",
-                          border: "1px solid var(--border-light)",
-                          borderRadius: "var(--radius-md)",
-                          fontFamily: "inherit",
-                          fontSize: "16px",
-                          transition: "all 0.2s ease",
-                          backgroundColor: "white",
-                        }}
-                        onFocus={(e) => {
-                          e.target.style.borderColor = "var(--primary-blue)";
-                          e.target.style.boxShadow =
-                            "0 0 0 3px rgba(66, 133, 244, 0.1)";
-                        }}
-                        onBlur={(e) => {
-                          e.target.style.borderColor = "var(--border-light)";
-                          e.target.style.boxShadow = "none";
-                        }}
-                        required
-                        disabled={isLoading}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        style={{
-                          position: "absolute",
-                          right: "12px",
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          background: "none",
-                          border: "none",
-                          color: "var(--text-muted)",
-                          cursor: "pointer",
-                          padding: "4px",
-                          borderRadius: "4px",
-                          transition: "color 0.2s ease",
-                        }}
-                        onMouseEnter={(e) =>
-                          ((e.currentTarget as HTMLButtonElement).style.color =
-                            "var(--text-secondary)")
-                        }
-                        onMouseLeave={(e) =>
-                          ((e.currentTarget as HTMLButtonElement).style.color =
-                            "var(--text-muted)")
-                        }
-                      >
-                        {showPassword ? (
-                          <EyeOff className="w-5 h-5" />
-                        ) : (
-                          <Eye className="w-5 h-5" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isLoading || !email.trim() || !password.trim()}
-                    className="btn btn-primary btn-large"
-                    style={{ width: "100%" }}
-                  >
-                    {isLoading ? (
-                      <span
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <div
-                          className="spinner"
-                          style={{ marginRight: "8px" }}
-                        ></div>
-                        Entrando...
-                      </span>
-                    ) : (
-                      <span
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        Entrar
-                        <ArrowRight
-                          className="w-5 h-5"
-                          style={{ marginLeft: "8px" }}
-                        />
-                      </span>
-                    )}
-                  </button>
-                </form>
-
-                {/* Footer */}
-                <div
-                  style={{
-                    textAlign: "center",
-                    marginTop: "32px",
-                    paddingTop: "24px",
-                    borderTop: "1px solid var(--border-light)",
-                  }}
-                >
-                  <p
-                    style={{
-                      color: "var(--text-secondary)",
-                      marginBottom: "12px",
-                      fontSize: "14px",
-                    }}
-                  >
-                    Não tem uma conta?
-                  </p>
-                  <Link
-                    href="/cadastro/professor"
-                    style={{
-                      color: "var(--primary-blue)",
-                      textDecoration: "none",
-                      fontWeight: "500",
-                      fontSize: "14px",
-                      transition: "color 0.2s ease",
-                    }}
-                    onMouseEnter={(e) =>
-                      ((e.currentTarget as HTMLAnchorElement).style.color =
-                        "#3367d6")
-                    }
-                    onMouseLeave={(e) =>
-                      ((e.currentTarget as HTMLAnchorElement).style.color =
-                        "var(--primary-blue)")
-                    }
-                  >
-                    Criar conta de professor
-                  </Link>
-                </div>
-
-                <div style={{ textAlign: "center", marginTop: "20px" }}>
-                  <p
-                    style={{
-                      color: "var(--text-muted)",
-                      marginBottom: "8px",
-                      fontSize: "12px",
-                    }}
-                  >
-                    Você é estudante?
-                  </p>
-                  <Link
-                    href="/login/estudante"
-                    style={{
-                      color: "var(--primary-green)",
-                      textDecoration: "none",
-                      fontSize: "14px",
-                      fontWeight: "500",
-                      transition: "color 0.2s ease",
-                    }}
-                  >
-                    Acesso para Estudantes
-                  </Link>
-                </div>
-
-                <div style={{ textAlign: "center", marginTop: "20px" }}>
-                  <Link
-                    href="/login"
-                    style={{
-                      color: "var(--text-muted)",
-                      textDecoration: "none",
-                      fontSize: "12px",
-                      transition: "color 0.2s ease",
-                    }}
-                  >
-                    ← Voltar às opções de login
-                  </Link>
-                </div>
+                <LoginLinks
+                  userType="professor"
+                  signupUrl="/cadastro/professor"
+                  alternateLoginUrl="/login/estudante"
+                  alternateLoginLabel="Acesso para Estudantes"
+                />
               </div>
             </div>
           </div>

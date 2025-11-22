@@ -34,7 +34,7 @@ export function validatePassword(password: string): {
     hasUppercase: /[A-Z]/.test(password),
     hasLowercase: /[a-z]/.test(password),
     hasNumber: /\d/.test(password),
-    hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
   };
 
   const score = Object.values(requirements).filter(Boolean).length;
@@ -43,7 +43,7 @@ export function validatePassword(password: string): {
   return {
     isValid,
     score,
-    requirements
+    requirements,
   };
 }
 
@@ -54,16 +54,20 @@ export function validatePassword(password: string): {
  * @param maxAge - Maximum age allowed (default: 100)
  * @returns True if age is within valid range
  */
-export function validateAge(birthDate: string | Date, minAge: number = 6, maxAge: number = 100): boolean {
+export function validateAge(
+  birthDate: string | Date,
+  minAge: number = 6,
+  maxAge: number = 100
+): boolean {
   const birth = new Date(birthDate);
   const today = new Date();
   const age = today.getFullYear() - birth.getFullYear();
   const monthDiff = today.getMonth() - birth.getMonth();
-  
+
   if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
     return age - 1 >= minAge && age - 1 <= maxAge;
   }
-  
+
   return age >= minAge && age <= maxAge;
 }
 
@@ -76,7 +80,7 @@ export function generateVerificationCode(length: number = 6): string {
   return Math.random()
     .toString()
     .slice(2, 2 + length)
-    .padStart(length, '0');
+    .padStart(length, "0");
 }
 
 /**
@@ -85,7 +89,10 @@ export function generateVerificationCode(length: number = 6): string {
  * @param lastName - User's last name
  * @returns Formatted display name
  */
-export function formatUserDisplayName(firstName: string, lastName?: string): string {
+export function formatUserDisplayName(
+  firstName: string,
+  lastName?: string
+): string {
   if (!lastName) return firstName;
   return `${firstName} ${lastName}`;
 }
@@ -95,19 +102,23 @@ export function formatUserDisplayName(firstName: string, lastName?: string): str
  * @param user - User object with age or role information
  * @returns True if user is considered a student
  */
-export function isStudent(user: { age?: number; role?: string; birthDate?: string }): boolean {
+export function isStudent(user: {
+  age?: number;
+  role?: string;
+  birthDate?: string;
+}): boolean {
   if (user.role) {
-    return user.role.toLowerCase() === 'student';
+    return user.role.toLowerCase() === "student";
   }
-  
+
   if (user.age) {
     return user.age >= 6 && user.age <= 18;
   }
-  
+
   if (user.birthDate) {
     return validateAge(user.birthDate, 6, 18);
   }
-  
+
   return false;
 }
 
@@ -117,7 +128,10 @@ export function isStudent(user: { age?: number; role?: string; birthDate?: strin
  * @returns True if user is a teacher
  */
 export function isTeacher(user: { role?: string }): boolean {
-  return user.role?.toLowerCase() === 'teacher' || user.role?.toLowerCase() === 'professor';
+  return (
+    user.role?.toLowerCase() === "teacher" ||
+    user.role?.toLowerCase() === "professor"
+  );
 }
 
 export interface UserData {
@@ -147,8 +161,8 @@ export function createUserSession(user: UserData): {
     id: user.id,
     name: formatUserDisplayName(user.firstName, user.lastName),
     email: user.email,
-    role: user.role || (isStudent(user) ? 'student' : 'teacher'),
+    role: user.role || (isStudent(user) ? "student" : "teacher"),
     isStudent: isStudent(user),
-    isTeacher: isTeacher(user)
+    isTeacher: isTeacher(user),
   };
 }

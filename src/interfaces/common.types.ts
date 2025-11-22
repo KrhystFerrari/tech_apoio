@@ -36,7 +36,7 @@ export interface ConfiguracaoData {
   valor: string;
   descricao?: string;
   categoria: string;
-  tipo: 'STRING' | 'NUMBER' | 'BOOLEAN' | 'JSON';
+  tipo: "STRING" | "NUMBER" | "BOOLEAN" | "JSON";
   isPublica: boolean;
   createdAt: string;
   updatedAt: string;

@@ -10,9 +10,25 @@
   box-sizing: border-box;
 }
 
-html {
-  scroll-behavior: smooth;
+/* Previne problemas de hydration causados por extensões do browser */
+*[bis_skin_checked],
+*[__processed__],
+*[data-grammarly-shadow-root],
+*[data-lastpass-icon-root],
+*[data-adblock],
+*[data-ublock] {
+  /* Garante que atributos de extensões não afetem o layout */
+  content-visibility: auto !important;
 }
+
+/* Suprime warnings de hydration em desenvolvimento */
+.__next_error_boundary {
+  display: none !important;
+}
+
+/* html {
+  scroll-behavior: smooth; Temporariamente desabilitado para debug
+} */
 
 body {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",

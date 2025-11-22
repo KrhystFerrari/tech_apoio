@@ -7,7 +7,10 @@ interface ClientOnlyProps {
   fallback?: React.ReactNode;
 }
 
-export function ClientOnly({ children, fallback = null }: Readonly<ClientOnlyProps>) {
+export function ClientOnly({
+  children,
+  fallback = null,
+}: Readonly<ClientOnlyProps>) {
   const [hasMounted, setHasMounted] = useState(false);
 
   // Use a ref-based approach to avoid the setState in effect warning

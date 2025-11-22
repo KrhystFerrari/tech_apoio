@@ -61,11 +61,11 @@ export enum ActivityType {
   LOGICAL_SEQUENCE = "LOGICAL_SEQUENCE",
   DRAG_DROP = "DRAG_DROP",
   TYPING = "TYPING",
-  DRAWING = "DRAWING"
+  DRAWING = "DRAWING",
 }
 
 export enum Difficulty {
   EASY = "EASY",
   MEDIUM = "MEDIUM",
-  HARD = "HARD"
+  HARD = "HARD",
 }

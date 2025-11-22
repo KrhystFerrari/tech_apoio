@@ -1,0 +1,11 @@
+export { ContagemGame } from "./ContagemGame";
+export { OperacoesGame } from "./OperacoesGame";
+export { CienciasGame } from "./CienciasGame";
+export { FormePalavrasGame } from "./FormePalavrasGame";
+export { ProgramacaoGame } from "./ProgramacaoGame";
+export { GamesHeader } from "./GamesHeader";
+export { GameHeroSection } from "./GameHeroSection";
+export { GameGrid } from "./GameGrid";
+export { GameView } from "./GameView";
+export { GamesFooter } from "./GamesFooter";
+export type { GameData } from "./GameGrid";

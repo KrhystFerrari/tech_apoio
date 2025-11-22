@@ -25,6 +25,7 @@ model User {
   // Relacionamentos
   students Student[]
   classes  Class[]
+  reports  Report[]
 
   @@map("users")
 }
@@ -63,12 +64,15 @@ model Student {
   updatedAt DateTime @updatedAt
 
   // Relacionamentos
-  teacher   User      @relation(fields: [teacherId], references: [id])
-  teacherId String
-  class     Class?    @relation(fields: [classId], references: [id])
-  classId   String?
-  progress  Progress[]
-  scores    GameScore[]
+  teacher      User             @relation(fields: [teacherId], references: [id])
+  teacherId    String
+  class        Class?           @relation(fields: [classId], references: [id])
+  classId      String?
+  progress     Progress[]
+  scores       GameScore[]
+  badges       StudentBadge[]
+  rankings     StudentRanking[]
+  reports      Report[]
 
   @@map("students")
 }
@@ -85,6 +89,8 @@ model Subject {
 
   // Relacionamentos
   activities Activity[]
+  rankings   Ranking[]
+  reports    Report[]
 
   @@map("subjects")
 }
@@ -180,6 +186,157 @@ model GameScore {
   @@map("game_scores")
 }
 
+// Modelo de Badges/Conquistas
+model Badge {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  description String
+  icon        String     // Emoji ou nome do ícone
+  category    BadgeCategory
+  requirement String     // Descrição do requisito
+  points      Int        @default(10)
+  rarity      BadgeRarity @default(COMMON)
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relacionamentos
+  studentBadges StudentBadge[]
+
+  @@map("badges")
+}
+
+// Categorias de badges
+enum BadgeCategory {
+  PROGRESS      // Badges de progresso
+  ACHIEVEMENT   // Badges de conquista
+  STREAK        // Badges de sequência
+  MASTERY       // Badges de maestria
+  SPECIAL       // Badges especiais
+}
+
+// Raridade dos badges
+enum BadgeRarity {
+  COMMON    // Comum
+  RARE      // Raro  
+  EPIC      // Épico
+  LEGENDARY // Lendário
+}
+
+// Modelo de Badges conquistados por estudantes
+model StudentBadge {
+  id        String   @id @default(cuid())
+  earnedAt  DateTime @default(now())
+
+  // Relacionamentos
+  student   Student @relation(fields: [studentId], references: [id])
+  studentId String
+  badge     Badge   @relation(fields: [badgeId], references: [id])
+  badgeId   String
+
+  @@unique([studentId, badgeId])
+  @@map("student_badges")
+}
+
+// Modelo de Ranking/Leaderboard
+model Ranking {
+  id          String      @id @default(cuid())
+  period      RankingPeriod
+  subjectId   String?     // Opcional - ranking geral ou por matéria
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+
+  // Relacionamentos
+  subject     Subject?    @relation(fields: [subjectId], references: [id])
+  rankings    StudentRanking[]
+
+  @@map("rankings")
+}
+
+// Períodos de ranking
+enum RankingPeriod {
+  DAILY     // Diário
+  WEEKLY    // Semanal  
+  MONTHLY   // Mensal
+  YEARLY    // Anual
+  ALL_TIME  // Histórico
+}
+
+// Posições dos estudantes no ranking
+model StudentRanking {
+  id        String   @id @default(cuid())
+  position  Int
+  points    Int
+  createdAt DateTime @default(now())
+
+  // Relacionamentos
+  student   Student  @relation(fields: [studentId], references: [id])
+  studentId String
+  ranking   Ranking  @relation(fields: [rankingId], references: [id])
+  rankingId String
+
+  @@unique([studentId, rankingId])
+  @@map("student_rankings")
+}
+
+// Modelo para arquivos de mídia (áudio, imagem)
+model MediaFile {
+  id        String    @id @default(cuid())
+  filename  String
+  originalName String
+  mimetype  String
+  size      Int       // Tamanho em bytes
+  url       String    // URL do arquivo
+  type      MediaType
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relacionamentos
+  words     Word[]    @relation("WordAudio")
+  wordImages Word[]   @relation("WordImage")
+
+  @@map("media_files")
+}
+
+// Tipos de mídia
+enum MediaType {
+  AUDIO
+  IMAGE
+  VIDEO
+}
+
+// Modelo de Relatórios para Professores
+model Report {
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  type        ReportType
+  data        Json       // Dados do relatório em JSON
+  period      String     // Período do relatório
+  createdAt   DateTime   @default(now())
+
+  // Relacionamentos
+  teacher     User       @relation(fields: [teacherId], references: [id])
+  teacherId   String
+  student     Student?   @relation(fields: [studentId], references: [id])
+  studentId   String?
+  subject     Subject?   @relation(fields: [subjectId], references: [id])
+  subjectId   String?
+
+  @@map("reports")
+}
+
+// Tipos de relatório
+enum ReportType {
+  STUDENT_PROGRESS    // Progresso individual
+  CLASS_OVERVIEW      // Visão geral da turma
+  SUBJECT_PERFORMANCE // Performance por matéria
+  ACTIVITY_ANALYTICS  // Análise de atividades
+  ENGAGEMENT_REPORT   // Relatório de engajamento
+}
+
 // Modelo de Palavras para jogos de Português
 model Word {
   id          String     @id @default(cuid())
@@ -187,11 +344,17 @@ model Word {
   difficulty  Difficulty @default(EASY)
   category    String     // Categoria da palavra (animais, cores, etc.)
   syllables   Int        // Número de sílabas
-  audioUrl    String?    // URL do áudio da palavra
-  imageUrl    String?    // URL da imagem da palavra
+  audioUrl    String?    // URL do áudio da palavra - DEPRECATED
+  imageUrl    String?    // URL da imagem da palavra - DEPRECATED
   meaning     String?    // Significado da palavra
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
+
+  // Relacionamentos com mídia
+  audioFile   MediaFile? @relation("WordAudio", fields: [audioFileId], references: [id])
+  audioFileId String?
+  imageFile   MediaFile? @relation("WordImage", fields: [imageFileId], references: [id])
+  imageFileId String?
 
   @@map("words")
 }
